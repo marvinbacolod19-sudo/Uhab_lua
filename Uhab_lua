@@ -1,43 +1,40 @@
---[[ 
-    GeminiXD 2108 | MM2 Ultimate Tap-to-Shoot
-    UI: Rayfield (Mobile Optimized)
-]]--
-
+-- GeminiXD 2108 | MM2 SAFE PRO V3 (AUTO-AIM FIX)
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-    Name = "GeminiXD | MM2 Pro",
-    LoadingTitle = "Directing Tech 2108...",
-    LoadingSubtitle = "Admin Edition",
+    Name = "GeminiXD | MM2 Clean Pro",
+    LoadingTitle = "Filtering Viruses...",
+    LoadingSubtitle = "Year 2108 Security",
     ConfigurationSaving = {Enabled = false},
     KeySystem = false
 })
 
 local Tab = Window:CreateTab("Combat", 4483362458)
-
-local targetMurd = true
 local lp = game.Players.LocalPlayer
+_G.TapToShoot = false -- Default OFF muna
 
--- Function para sa Pag-detect at Pag-shoot
-local function shootMurderer()
-    if not targetMurd then return end
+-- 🎯 FIXED SHOOT LOGIC V3
+local function shootAtMurderer()
+    if not _G.TapToShoot then return end
     
-    local character = lp.Character
-    local gun = character and (character:FindFirstChild("Gun") or lp.Backpack:FindFirstChild("Gun"))
+    local char = lp.Character
+    local gun = char and char:FindFirstChild("Gun") or lp.Backpack:FindFirstChild("Gun")
     
     if not gun then return end
 
-    -- Hanapin ang Murderer
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= lp and v.Character and (v.Character:FindFirstChild("Knife") or v.Backpack:FindFirstChild("Knife")) then
-            local targetHrp = v.Character:FindFirstChild("HumanoidRootPart")
-            if targetHrp then
-                -- Direct Remote Fire (MM2 2026 Optimized)
-                local rs = game:GetService("ReplicatedStorage")
-                local shoot = rs:FindFirstChild("ShootGun", true) or rs:FindFirstChild("GunShot", true)
+            local targetPart = v.Character:FindFirstChild("HumanoidRootPart")
+            if targetPart then
+                -- Eto ang lunas: I-force natin yung LookVector ng character
+                char.HumanoidRootPart.CFrame = CFrame.new(char.HumanoidRootPart.Position, targetPart.Position)
                 
-                if shoot then
-                    shoot:FireServer(targetHrp.Position)
+                local rs = game:GetService("ReplicatedStorage")
+                local shootRemote = rs:FindFirstChild("ShootGun", true) or rs:FindFirstChild("GunShot", true)
+                
+                if shootRemote then
+                    -- Pinapasa ang Position + Target Instance
+                    shootRemote:FireServer(targetPart.Position, targetPart)
                     print("GeminiXD: Murderer Deleted! 🎯")
                 end
             end
@@ -48,11 +45,11 @@ end
 
 -- UI Toggle
 Tab:CreateToggle({
-    Name = "Tap-to-Shoot Murderer",
-    CurrentValue = true,
-    Flag = "TSSM",
+    Name = "Active Tap-to-Shoot",
+    CurrentValue = false,
+    Flag = "TSSM_SAFE",
     Callback = function(Value)
-        targetMurd = Value
+        _G.TapToShoot = Value
     end,
 })
 
@@ -60,13 +57,6 @@ Tab:CreateToggle({
 game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
     if processed then return end
     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        pcall(shootMurderer)
+        pcall(shootAtMurderer)
     end
 end)
-
-Rayfield:Notify({
-    Title = "Ready to Go!",
-    Content = "Equip Gun and Tap anywhere to Kill Murderer.",
-    Duration = 5,
-    Image = 4483362458,
-})
