@@ -1,41 +1,52 @@
--- GeminiXD 2108 | MM2 SAFE PRO V3 (AUTO-AIM FIX)
+-- GeminiXD 2108 | MM2 ULTIMATE FIX V4
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
     Name = "GeminiXD | MM2 Clean Pro",
-    LoadingTitle = "Filtering Viruses...",
-    LoadingSubtitle = "Year 2108 Security",
+    LoadingTitle = "Bypassing MM2 Security...",
+    LoadingSubtitle = "Year 2108 Elite",
     ConfigurationSaving = {Enabled = false},
     KeySystem = false
 })
 
 local Tab = Window:CreateTab("Combat", 4483362458)
 local lp = game.Players.LocalPlayer
-_G.TapToShoot = false -- Default OFF muna
+_G.TapToShoot = false
 
--- 🎯 FIXED SHOOT LOGIC V3
-local function shootAtMurderer()
+-- 🎯 THE "NO-FAIL" SHOOT LOGIC
+local function superShoot()
     if not _G.TapToShoot then return end
     
     local char = lp.Character
     local gun = char and char:FindFirstChild("Gun") or lp.Backpack:FindFirstChild("Gun")
     
-    if not gun then return end
+    -- Kung wala pang baril sa kamay, i-force nating i-equip
+    if not char:FindFirstChild("Gun") and lp.Backpack:FindFirstChild("Gun") then
+        lp.Backpack.Gun.Parent = char
+    end
+    
+    if not char:FindFirstChild("Gun") then return end
 
     for _, v in pairs(game.Players:GetPlayers()) do
         if v ~= lp and v.Character and (v.Character:FindFirstChild("Knife") or v.Backpack:FindFirstChild("Knife")) then
-            local targetPart = v.Character:FindFirstChild("HumanoidRootPart")
-            if targetPart then
-                -- Eto ang lunas: I-force natin yung LookVector ng character
-                char.HumanoidRootPart.CFrame = CFrame.new(char.HumanoidRootPart.Position, targetPart.Position)
+            local targetHrp = v.Character:FindFirstChild("HumanoidRootPart")
+            if targetHrp then
+                -- 1. Haharap ang character mo (Instant)
+                char.HumanoidRootPart.CFrame = CFrame.new(char.HumanoidRootPart.Position, Vector3.new(targetHrp.Position.X, char.HumanoidRootPart.Position.Y, targetHrp.Position.Z))
                 
+                -- 2. Tatawagin ang Remote gamit ang tamang Arguments
                 local rs = game:GetService("ReplicatedStorage")
-                local shootRemote = rs:FindFirstChild("ShootGun", true) or rs:FindFirstChild("GunShot", true)
+                local remote = rs:FindFirstChild("ShootGun", true) or rs:FindFirstChild("GunShot", true)
                 
-                if shootRemote then
-                    -- Pinapasa ang Position + Target Instance
-                    shootRemote:FireServer(targetPart.Position, targetPart)
-                    print("GeminiXD: Murderer Deleted! 🎯")
+                if remote then
+                    -- MM2 Logic: Remote:FireServer(TargetPosition, TargetInstance)
+                    remote:FireServer(targetHrp.Position, targetHrp)
+                    
+                    -- 3. Visual Fake: Para magmukhang bumaril talaga (Iwas Ban)
+                    local gunShotEffect = char.Gun:FindFirstChild("KnifeServer") -- MM2 names are weird
+                    if not gunShotEffect then
+                        print("GeminiXD: Shot Fired! 🎯")
+                    end
                 end
             end
             break
@@ -47,16 +58,16 @@ end
 Tab:CreateToggle({
     Name = "Active Tap-to-Shoot",
     CurrentValue = false,
-    Flag = "TSSM_SAFE",
+    Flag = "TSSM_V4",
     Callback = function(Value)
         _G.TapToShoot = Value
     end,
 })
 
--- Mobile Tap Detection
+-- Mobile Tap Detection (Mas sensitibo na 'to)
 game:GetService("UserInputService").InputBegan:Connect(function(input, processed)
-    if processed then return end
+    -- Kahit processed (pumindot ka sa UI), hahayaan nating lumusot para sure
     if input.UserInputType == Enum.UserInputType.Touch or input.UserInputType == Enum.UserInputType.MouseButton1 then
-        pcall(shootAtMurderer)
+        pcall(superShoot)
     end
 end)
